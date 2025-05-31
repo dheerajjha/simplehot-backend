@@ -1,0 +1,20 @@
+{
+  "name": "simplehot-backend",
+  "version": "1.0.0",
+  "description": "Microservice architecture with Express gateway",
+  "main": "index.js",
+  "scripts": {
+    "start": "docker-compose up",
+    "build": "docker-compose build",
+    "down": "docker-compose down",
+    "dev": "docker-compose up --build"
+  },
+  "keywords": [
+    "microservices",
+    "express",
+    "gateway",
+    "docker"
+  ],
+  "author": "",
+  "license": "ISC"
+} 

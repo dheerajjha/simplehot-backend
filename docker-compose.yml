@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "5050:5050"
+    depends_on:
+      - auth-service
+      - user-service
+    networks:
+      - microservices-network
+    environment:
+      - PORT=5050
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - USER_SERVICE_URL=http://user-service:5002
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "5001:5001"
+    networks:
+      - microservices-network
+    environment:
+      - PORT=5001
+      - JWT_SECRET=your_jwt_secret_key_here
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "5002:5002"
+    networks:
+      - microservices-network
+    environment:
+      - PORT=5002
+
+networks:
+  microservices-network:
+    driver: bridge 

@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 // Import routes
 const userRoutes = require('./src/routes/userRoutes');
 const postRoutes = require('./src/routes/postRoutes');
+const authRoutes = require('./src/routes/authRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.get('/api/users', (req, res) => {
 });
 
 // API routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 

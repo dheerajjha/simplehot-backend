@@ -50,6 +50,32 @@ const getUserByEmail = async (email) => {
   });
 };
 
+// Get user by username
+const getUserByUsername = async (username) => {
+  return prisma.user.findUnique({
+    where: { username },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      username: true,
+      bio: true,
+      profileImageUrl: true,
+      coverImageUrl: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: {
+        select: {
+          followers: true,
+          following: true,
+          posts: true,
+        },
+      },
+    },
+  });
+};
+
+// Create a new user (for sync from auth service)
 // Update user profile
 const updateUser = async (id, data) => {
   return prisma.user.update({
@@ -204,6 +230,8 @@ const getFeed = async (userId, page = 1, limit = 10) => {
 module.exports = {
   getUserById,
   getUserByEmail,
+  getUserByUsername,
+  
   updateUser,
   getFollowers,
   getFollowing,

@@ -4,7 +4,6 @@ services:
     ports:
       - "5050:5050"
     depends_on:
-      - auth-service
       - user-service
     networks:
       - microservices-network
@@ -13,24 +12,7 @@ services:
       - ./gateway/node_modules:/app/node_modules
     environment:
       - PORT=5050
-      - AUTH_SERVICE_URL=http://auth-service:5001
       - USER_SERVICE_URL=http://user-service:5002
-
-  auth-service:
-    build: ./auth-service
-    ports:
-      - "5001:5001"
-    networks:
-      - microservices-network
-    depends_on:
-      - postgres
-    volumes:
-      - ./auth-service:/app
-      - ./auth-service/node_modules:/app/node_modules
-    environment:
-      - PORT=5001
-      - JWT_SECRET=your_jwt_secret_key_here
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth_db?schema=public
 
   user-service:
     build: ./user-service
@@ -45,7 +27,9 @@ services:
       - ./user-service/node_modules:/app/node_modules
     environment:
       - PORT=5002
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_db?schema=public
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_db
+      - JWT_SECRET=your_jwt_secret_key_here
+    command: sh -c "npx prisma migrate deploy && npm start"
 
   postgres:
     image: postgres:14-alpine
@@ -53,13 +37,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+      - ./postgres/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     networks:
       - microservices-network
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_MULTIPLE_DATABASES=auth_db,user_db
 
 networks:
   microservices-network:

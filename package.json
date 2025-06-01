@@ -8,11 +8,11 @@
     "build": "docker-compose build",
     "down": "docker-compose down",
     "dev": "docker-compose up --build",
-    "dev:local": "concurrently \"cd gateway && npm run dev\" \"cd auth-service && npm run dev\" \"cd user-service && npm run dev\"",
-    "init:prisma": "npm run generate:prisma && npm run migrate:prisma && npm run seed:prisma",
-    "generate:prisma": "cd user-service && npx prisma generate && cd ../auth-service && npx prisma generate",
-    "migrate:prisma": "cd user-service && npx prisma migrate dev --name init && cd ../auth-service && npx prisma migrate dev --name init",
-    "seed:prisma": "cd user-service && npx prisma db seed && cd ../auth-service && npx prisma db seed"
+    "dev:local": "concurrently \"cd gateway && npm run dev\" \"cd user-service && npm run dev\"",
+    "test": "./test-endpoints.sh",
+    "init:prisma": "npm run generate:prisma && npm run migrate:prisma",
+    "generate:prisma": "cd user-service && npx prisma generate",
+    "migrate:prisma": "cd user-service && npx prisma migrate dev --name init"
   },
   "keywords": [
     "microservices",

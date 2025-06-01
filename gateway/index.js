@@ -18,7 +18,6 @@ app.use(morgan('combined'));
 app.use(express.json());
 
 // Constants for service URLs (from environment variables or default for local development)
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5001';
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:5002';
 
 // Routes
@@ -26,8 +25,8 @@ app.get('/', (req, res) => {
   res.json({ message: 'Gateway API is running' });
 });
 
-// Auth service proxy routes
-app.use('/api/auth', proxy(AUTH_SERVICE_URL, {
+// Auth service proxy routes (now handled by user service)
+app.use('/api/auth', proxy(USER_SERVICE_URL, {
   proxyReqPathResolver: (req) => {
     return `/api/auth${req.url}`;
   }
@@ -37,6 +36,13 @@ app.use('/api/auth', proxy(AUTH_SERVICE_URL, {
 app.use('/api/users', proxy(USER_SERVICE_URL, {
   proxyReqPathResolver: (req) => {
     return `/api/users${req.url}`;
+  }
+}));
+
+// Posts service proxy routes (also handled by user service)
+app.use('/api/posts', proxy(USER_SERVICE_URL, {
+  proxyReqPathResolver: (req) => {
+    return `/api/posts${req.url}`;
   }
 }));
 

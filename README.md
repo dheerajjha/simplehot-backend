@@ -104,15 +104,32 @@ This will start the development environment in a container with all necessary to
 
 The Gateway provides a unified API for all microservices:
 
-- `POST /auth/register` - Register a new user
-- `POST /auth/login` - Authenticate a user and get a token
-- `GET /users/profile` - Get the current user's profile (authenticated)
-- `GET /users/:id` - Get a user's profile by ID
-- `PUT /users/profile` - Update the current user's profile (authenticated)
-- `POST /users/follow/:id` - Follow a user (authenticated)
-- `DELETE /users/follow/:id` - Unfollow a user (authenticated)
-- `GET /users/followers` - Get the current user's followers (authenticated)
-- `GET /users/following` - Get the users the current user is following (authenticated)
+#### Authentication Endpoints
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Authenticate a user and get a token
+- `GET /api/auth/verify` - Verify a JWT token
+
+#### User Management Endpoints
+- `GET /api/users/profile` - Get the current user's profile (authenticated)
+- `GET /api/users/:id` - Get a user's profile by ID (authenticated)
+- `PUT /api/users/profile` - Update the current user's profile (authenticated)
+- `GET /api/users/:id/followers` - Get a user's followers (authenticated)
+- `GET /api/users/:id/following` - Get users that a user is following (authenticated)
+- `POST /api/users/:id/follow` - Follow a user (authenticated)
+- `DELETE /api/users/:id/follow` - Unfollow a user (authenticated)
+
+#### Posts Endpoints
+- `POST /api/posts` - Create a new post (authenticated)
+- `GET /api/posts/:id` - Get a post by ID (authenticated)
+- `GET /api/posts/user/:userId` - Get all posts by a user (authenticated)
+- `POST /api/posts/:id/like` - Like a post (authenticated)
+- `DELETE /api/posts/:id/like` - Unlike a post (authenticated)
+- `GET /api/posts/:id/likes` - Get all likes for a post (authenticated)
+- `POST /api/posts/:id/comments` - Add a comment to a post (authenticated)
+- `GET /api/posts/:id/comments` - Get all comments for a post (authenticated)
+
+#### Health Check
+- `GET /health` - Check if the gateway is running
 
 ## License
 

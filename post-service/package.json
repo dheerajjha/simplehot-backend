@@ -1,7 +1,7 @@
 {
-  "name": "gateway",
+  "name": "post-service",
   "version": "1.0.0",
-  "description": "API Gateway for microservices",
+  "description": "Post service for SimpleHot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -12,12 +12,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-http-proxy": "^1.6.3",
-    "express-rate-limit": "^7.5.0",
     "helmet": "^7.1.0",
-    "morgan": "^1.10.0"
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "@prisma/client": "^5.7.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "prisma": "^5.7.0"
   }
-}
+} 

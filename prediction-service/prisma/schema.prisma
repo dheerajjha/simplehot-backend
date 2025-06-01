@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Prediction {
+  id                  Int                 @id @default(autoincrement())
+  stockSymbol         String
+  stockName           String
+  userId              Int
+  targetPrice         Float
+  currentPrice        Float
+  targetDate          DateTime
+  direction           String              // "up" or "down"
+  description         String?
+  status              String              // "pending", "correct", "incorrect"
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  percentageDifference Float?
+  
+  comments            PredictionComment[]
+  likes               PredictionLike[]
+}
+
+model PredictionLike {
+  id                Int         @id @default(autoincrement())
+  predictionId      Int
+  prediction        Prediction  @relation(fields: [predictionId], references: [id])
+  userId            Int
+  createdAt         DateTime    @default(now())
+  
+  @@unique([userId, predictionId])
+}
+
+model PredictionComment {
+  id                Int         @id @default(autoincrement())
+  content           String
+  predictionId      Int
+  prediction        Prediction  @relation(fields: [predictionId], references: [id])
+  userId            Int
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+} 

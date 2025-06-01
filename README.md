@@ -1,15 +1,19 @@
 # SimpleHot Backend
 
-A microservice-based backend system with Express Gateway, Authentication Service, and User Service.
+A microservice-based backend system for SimpleHot, a Twitter-like platform for Indian stock predictions.
 
 ## Architecture
 
 The system is comprised of the following components:
 
 1. **API Gateway** - Entry point for all client requests, handles routing to microservices
-2. **Authentication Service** - Handles user registration, login, and token verification
+2. **Auth Service** - Handles user registration, login, and token verification
 3. **User Service** - Manages user profiles and social graph functionality
-4. **PostgreSQL Database** - Persistent storage for user data and authentication information
+4. **Post Service** - Handles general posts functionality
+5. **Stock Service** - Provides stock data and search functionality
+6. **Prediction Service** - Manages stock predictions and verification
+7. **Redis** - Caching for frequently accessed data
+8. **PostgreSQL Database** - Persistent storage for all services
 
 ## Setup
 
@@ -17,7 +21,7 @@ The system is comprised of the following components:
 
 - Node.js (v14 or later)
 - npm (v6 or later)
-- Docker and Docker Compose (optional, for containerized setup)
+- Docker and Docker Compose (for containerized setup)
 - PostgreSQL (if running in local mode)
 
 ### Installation
@@ -29,25 +33,17 @@ git clone <repository-url>
 cd simplehot-backend
 ```
 
-2. Run the setup script:
+2. Start services using Docker:
 
 ```bash
-./setup.sh
+docker-compose up
 ```
-
-The setup script will:
-- Check for Docker availability
-- Ask if you want to run in Docker or local mode
-- Install all necessary dependencies
-- Configure environment variables
-- Check for and configure .npmrc file for npm authentication
-- Start the services based on your chosen mode
 
 ## Development Modes
 
 ### Docker Mode
 
-The Docker mode runs all services in containers, including PostgreSQL. This provides an isolated environment that's easier to set up and consistent across different development machines.
+The Docker mode runs all services in containers, including PostgreSQL and Redis. This provides an isolated environment that's easier to set up and consistent across different development machines.
 
 To start in Docker mode:
 
@@ -55,9 +51,15 @@ To start in Docker mode:
 docker-compose up
 ```
 
+To start a specific service:
+
+```bash
+docker-compose up gateway auth-service
+```
+
 ### Local Mode
 
-In local mode, you'll need to run each service individually and have PostgreSQL installed locally.
+In local mode, you'll need to run each service individually and have PostgreSQL and Redis installed locally.
 
 To start in local mode:
 
@@ -68,35 +70,8 @@ cd gateway && npm start
 # Start the auth service
 cd auth-service && npm start
 
-# Start the user service
-cd user-service && npm start
+# Start other services similarly
 ```
-
-## Troubleshooting
-
-### npm Authentication Issues in Docker
-
-If you encounter npm authentication errors during Docker builds, it could be due to:
-
-1. Missing .npmrc file in your home directory
-2. Using HTTP instead of HTTPS in your npm registry URLs
-
-The setup script will help you fix these issues by:
-- Creating a basic .npmrc file if one doesn't exist
-- Offering to update HTTP URLs to HTTPS
-- Mounting your .npmrc file from your host machine to the Docker containers
-
-This approach allows Docker containers to use your local npm authentication without having to store credentials in the Docker images.
-
-### Development with VS Code Dev Containers
-
-This project includes configurations for VS Code Dev Containers. To use them:
-
-1. Install the "Remote - Containers" extension in VS Code
-2. Open the project folder in VS Code
-3. Click the green button in the bottom-left corner and select "Reopen in Container"
-
-This will start the development environment in a container with all necessary tools and extensions pre-configured.
 
 ## API Documentation
 
@@ -128,6 +103,22 @@ The Gateway provides a unified API for all microservices:
 - `POST /api/posts/:id/comments` - Add a comment to a post (authenticated)
 - `GET /api/posts/:id/comments` - Get all comments for a post (authenticated)
 
+#### Stock Endpoints
+- `GET /api/stocks/trending` - Get trending stocks
+- `GET /api/stocks/:symbol` - Get stock details
+- `GET /api/stocks/search` - Search for stocks
+- `GET /api/stocks/:symbol/history` - Get stock historical data
+
+#### Prediction Endpoints
+- `POST /api/predictions` - Create a stock prediction
+- `GET /api/predictions/trending` - Get trending predictions
+- `GET /api/predictions/stock/:symbol` - Get predictions for a stock
+- `GET /api/predictions/user/:userId` - Get user's predictions
+- `POST /api/predictions/:id/like` - Like a prediction
+- `DELETE /api/predictions/:id/like` - Unlike a prediction
+- `POST /api/predictions/:id/comments` - Comment on a prediction
+- `GET /api/predictions/:id/comments` - Get prediction comments
+
 #### Health Check
 - `GET /health` - Check if the gateway is running
 
@@ -136,8 +127,13 @@ The Gateway provides a unified API for all microservices:
 | Service | Port | Purpose | Status |
 |---------|------|---------|--------|
 | **API Gateway** | 5050 | Request routing & aggregation | ✅ |
+| **Auth Service** | 5001 | Authentication & authorization | ✅ |
 | **User Service** | 5002 | User management & social features | ✅ |
+| **Post Service** | 5003 | Post management & interactions | ✅ |
+| **Stock Service** | 5004 | Stock data & search | ✅ |
+| **Prediction Service** | 5005 | Stock predictions | ✅ |
 | **PostgreSQL** | 5432 | Database | ✅ |
+| **Redis** | 6379 | Caching | ✅ |
 | **pgAdmin** | 8080 | Database administration | ✅ |
 
 ## Quick Start Commands
@@ -147,7 +143,10 @@ The Gateway provides a unified API for all microservices:
 docker-compose up
 
 # Run comprehensive tests  
-./test-endpoints.sh
+./tests/run-all-tests.sh
+
+# Run specific test suite
+./tests/auth-tests.sh
 
 # View database
 open http://localhost:8080
@@ -157,7 +156,7 @@ curl http://localhost:5050/health
 
 # View logs
 docker-compose logs -f gateway
-docker-compose logs -f user-service
+docker-compose logs -f auth-service
 ```
 
 ## License

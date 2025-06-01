@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Stock {
+  id            Int      @id @default(autoincrement())
+  symbol        String   @unique
+  name          String
+  currentPrice  Float
+  change        Float?
+  changePercent Float?
+  volume        Int?
+  marketCap     Int?
+  dayHigh       Float?
+  dayLow        Float?
+  yearHigh      Float?
+  yearLow       Float?
+  lastUpdated   DateTime @default(now())
+  history       StockHistory[]
+}
+
+model StockHistory {
+  id          Int      @id @default(autoincrement())
+  stockSymbol String
+  date        DateTime @default(now())
+  open        Float
+  high        Float
+  low         Float
+  close       Float
+  volume      Int
+  stock       Stock?   @relation(fields: [stockSymbol], references: [symbol])
+  
+  @@unique([stockSymbol, date])
+} 

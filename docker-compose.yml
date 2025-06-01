@@ -44,9 +44,25 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "8080:80"
+    networks:
+      - microservices-network
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@simplehot.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
 networks:
   microservices-network:
     driver: bridge
 
 volumes:
-  postgres-data: 
+  postgres-data:
+  pgadmin-data: 

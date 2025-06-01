@@ -131,6 +131,35 @@ The Gateway provides a unified API for all microservices:
 #### Health Check
 - `GET /health` - Check if the gateway is running
 
+## Services Overview
+
+| Service | Port | Purpose | Status |
+|---------|------|---------|--------|
+| **API Gateway** | 5050 | Request routing & aggregation | ✅ |
+| **User Service** | 5002 | User management & social features | ✅ |
+| **PostgreSQL** | 5432 | Database | ✅ |
+| **pgAdmin** | 8080 | Database administration | ✅ |
+
+## Quick Start Commands
+
+```bash
+# Start all services
+docker-compose up
+
+# Run comprehensive tests  
+./test-endpoints.sh
+
+# View database
+open http://localhost:8080
+
+# Check service health
+curl http://localhost:5050/health
+
+# View logs
+docker-compose logs -f gateway
+docker-compose logs -f user-service
+```
+
 ## License
 
 MIT 

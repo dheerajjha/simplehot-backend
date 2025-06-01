@@ -2,6 +2,19 @@ const express = require('express');
 const authService = require('../services/authService');
 const router = express.Router();
 
+// Email validation function
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Password validation function
+const isValidPassword = (password) => {
+  // Password must be at least 8 characters long and contain at least one letter and one number
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+  return passwordRegex.test(password);
+};
+
 // Login route
 router.post('/login', async (req, res) => {
   try {
@@ -9,6 +22,11 @@ router.post('/login', async (req, res) => {
     
     if (!email || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
+    }
+    
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'Please provide a valid email address' });
     }
     
     // Find user by email
@@ -45,6 +63,18 @@ router.post('/register', async (req, res) => {
     
     if (!email || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
+    }
+    
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'Please provide a valid email address' });
+    }
+    
+    // Validate password strength
+    if (!isValidPassword(password)) {
+      return res.status(400).json({ 
+        message: 'Password must be at least 8 characters long and contain at least one letter and one number' 
+      });
     }
     
     // Check if user already exists

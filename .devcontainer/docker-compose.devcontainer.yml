@@ -1,6 +1,10 @@
+version: '3.8'
+
 services:
   gateway:
-    build: ./gateway
+    build: 
+      context: ../gateway
+      dockerfile: Dockerfile
     ports:
       - "5050:5050"
     depends_on:
@@ -9,15 +13,18 @@ services:
     networks:
       - microservices-network
     volumes:
-      - ./gateway:/app
-      - ./gateway/node_modules:/app/node_modules
+      - ..:/workspace:cached
+      - ${HOME}/.npmrc:/root/.npmrc:ro
     environment:
       - PORT=5050
       - AUTH_SERVICE_URL=http://auth-service:5001
       - USER_SERVICE_URL=http://user-service:5002
+    command: /bin/sh -c "while sleep 1000; do :; done"
 
   auth-service:
-    build: ./auth-service
+    build: 
+      context: ../auth-service
+      dockerfile: Dockerfile
     ports:
       - "5001:5001"
     networks:
@@ -25,15 +32,18 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./auth-service:/app
-      - ./auth-service/node_modules:/app/node_modules
+      - ..:/workspace:cached
+      - ${HOME}/.npmrc:/root/.npmrc:ro
     environment:
       - PORT=5001
       - JWT_SECRET=your_jwt_secret_key_here
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth_db?schema=public
+    command: /bin/sh -c "while sleep 1000; do :; done"
 
   user-service:
-    build: ./user-service
+    build: 
+      context: ../user-service
+      dockerfile: Dockerfile
     ports:
       - "5002:5002"
     networks:
@@ -41,11 +51,12 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./user-service:/app
-      - ./user-service/node_modules:/app/node_modules
+      - ..:/workspace:cached
+      - ${HOME}/.npmrc:/root/.npmrc:ro
     environment:
       - PORT=5002
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_db?schema=public
+    command: /bin/sh -c "while sleep 1000; do :; done"
 
   postgres:
     image: postgres:14-alpine
@@ -53,7 +64,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+      - ../postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
     networks:
       - microservices-network
     environment:

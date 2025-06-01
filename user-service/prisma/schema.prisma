@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int             @id @default(autoincrement())
+  email             String          @unique
+  name              String?
+  username          String?         @unique
+  bio               String?
+  profileImageUrl   String?
+  coverImageUrl     String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Self-relations for follows
+  followers         Follow[]        @relation("UserFollowers")
+  following         Follow[]        @relation("UserFollowing")
+  
+  // Posts relation (if you decide to add posts later)
+  posts             Post[]
+  
+  // Likes and comments relations (optional)
+  likes             Like[]
+  comments          Comment[]
+}
+
+model Follow {
+  id                Int             @id @default(autoincrement())
+  follower          User            @relation("UserFollowing", fields: [followerId], references: [id])
+  followerId        Int
+  following         User            @relation("UserFollowers", fields: [followingId], references: [id])
+  followingId       Int
+  createdAt         DateTime        @default(now())
+  
+  @@unique([followerId, followingId])
+}
+
+// Post model (optional for social media functionality)
+model Post {
+  id                Int             @id @default(autoincrement())
+  content           String
+  imageUrl          String?
+  author            User            @relation(fields: [authorId], references: [id])
+  authorId          Int
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  likes             Like[]
+  comments          Comment[]
+}
+
+// Like model (optional)
+model Like {
+  id                Int             @id @default(autoincrement())
+  user              User            @relation(fields: [userId], references: [id])
+  userId            Int
+  post              Post            @relation(fields: [postId], references: [id])
+  postId            Int
+  createdAt         DateTime        @default(now())
+  
+  @@unique([userId, postId])
+}
+
+// Comment model (optional)
+model Comment {
+  id                Int             @id @default(autoincrement())
+  content           String
+  user              User            @relation(fields: [userId], references: [id])
+  userId            Int
+  post              Post            @relation(fields: [postId], references: [id])
+  postId            Int
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+} 

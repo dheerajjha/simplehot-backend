@@ -2,12 +2,10 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm install
-
+# Copy all code
 COPY . .
 
+# Skip npm install - will use mounted node_modules from host
 EXPOSE 5050
 
 CMD ["npm", "start"] 

@@ -1,0 +1,46 @@
+{
+  "name": "SimpleHot Backend Dev Container",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "gateway",
+  "workspaceFolder": "/app",
+  
+  // Mount the host's .npmrc to provide npm authentication in the container
+  "mounts": [
+    "source=${localEnv:HOME}/.npmrc,target=/root/.npmrc,type=bind,consistency=cached"
+  ],
+  
+  // Set environment variables
+  "remoteEnv": {
+    "NODE_ENV": "development"
+  },
+  
+  // Configure VS Code settings
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker",
+        "Prisma.prisma"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        }
+      }
+    }
+  },
+  
+  // Use 'postCreateCommand' to run commands after the container is created
+  "postCreateCommand": "npm install",
+  
+  // Features to add to the dev container
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  }
+} 

@@ -35,7 +35,7 @@ services:
       - /app/node_modules
     environment:
       - PORT=5001
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
 
@@ -52,7 +52,7 @@ services:
       - /app/node_modules
     environment:
       - PORT=5002
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
 
@@ -69,7 +69,7 @@ services:
       - /app/node_modules
     environment:
       - PORT=5003
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/post_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
 
@@ -87,7 +87,7 @@ services:
       - /app/node_modules
     environment:
       - PORT=5004
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/stock_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
@@ -106,7 +106,7 @@ services:
       - /app/node_modules
     environment:
       - PORT=5005
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/prediction_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
@@ -148,6 +148,25 @@ services:
     depends_on:
       - postgres
 
+  metabase:
+    image: metabase/metabase:latest
+    ports:
+      - "12345:3000"
+    networks:
+      - microservices-network
+    environment:
+      - MB_DB_TYPE=postgres
+      - MB_DB_DBNAME=metabase
+      - MB_DB_PORT=5432
+      - MB_DB_USER=postgres
+      - MB_DB_PASS=postgres
+      - MB_DB_HOST=postgres
+    volumes:
+      - metabase-data:/metabase-data
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
 networks:
   microservices-network:
     driver: bridge
@@ -155,4 +174,5 @@ networks:
 volumes:
   postgres-data:
   pgadmin-data:
-  redis-data: 
+  redis-data:
+  metabase-data: 

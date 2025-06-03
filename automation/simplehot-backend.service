@@ -1,0 +1,33 @@
+[Unit]
+Description=SimpleHot Backend Services
+Requires=docker.service
+After=docker.service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/azureuser/simplehot-backend
+ExecStart=/home/azureuser/simplehot-backend/automation/start-services.sh start
+ExecStop=/home/azureuser/simplehot-backend/automation/start-services.sh stop
+ExecReload=/home/azureuser/simplehot-backend/automation/start-services.sh restart
+TimeoutStartSec=600
+TimeoutStopSec=120
+User=azureuser
+Group=azureuser
+
+# Restart policy
+Restart=on-failure
+RestartSec=30
+
+# Environment
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=DOCKER_HOST=unix:///var/run/docker.sock
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target 

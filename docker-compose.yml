@@ -4,11 +4,16 @@ services:
     ports:
       - "5050:5050"
     depends_on:
-      - auth-service
-      - user-service
-      - post-service
-      - stock-service
-      - prediction-service
+      auth-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      post-service:
+        condition: service_healthy
+      stock-service:
+        condition: service_healthy
+      prediction-service:
+        condition: service_healthy
     networks:
       - microservices-network
     volumes:
@@ -21,6 +26,13 @@ services:
       - POST_SERVICE_URL=http://post-service:5003
       - STOCK_SERVICE_URL=http://stock-service:5004
       - PREDICTION_SERVICE_URL=http://prediction-service:5005
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   auth-service:
     build: ./auth-service
@@ -29,7 +41,8 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./auth-service:/app
       - /app/node_modules
@@ -38,6 +51,13 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   user-service:
     build: ./user-service
@@ -46,7 +66,8 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./user-service:/app
       - /app/node_modules
@@ -55,6 +76,13 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   post-service:
     build: ./post-service
@@ -63,7 +91,8 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./post-service:/app
       - /app/node_modules
@@ -72,6 +101,13 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/simplehot_db
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   stock-service:
     build: ./stock-service
@@ -80,8 +116,10 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./stock-service:/app
       - /app/node_modules
@@ -91,6 +129,13 @@ services:
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   prediction-service:
     build: ./prediction-service
@@ -99,8 +144,10 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./prediction-service:/app
       - /app/node_modules
@@ -110,6 +157,13 @@ services:
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=your_jwt_secret_key_here
     command: npm start
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   postgres:
     image: postgres:14-alpine
@@ -123,6 +177,13 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   redis:
     image: redis:alpine
@@ -132,6 +193,13 @@ services:
       - microservices-network
     volumes:
       - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -146,7 +214,15 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   metabase:
     image: metabase/metabase:latest
@@ -164,8 +240,15 @@ services:
     volumes:
       - metabase-data:/metabase-data
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
 
 networks:
   microservices-network:
